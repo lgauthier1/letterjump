@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Letter Jump</title>
+    <style>
+      @import url(//rawcss.com/raw.css);
+      input[type=range] { padding: 0px; }
+      .page { width: 75%;margin-left: 10%;padding: 8px;transition: var(--transition); }
+      .content { width:100%;font-size: 100px;padding: 8px;}
+      .content > div { padding: 16px; }
+      .actions { margin-top: 10px;padding: 16px; }
+      .actions button { margin-left: 10px; }
+    </style>
+  </head>
+  <body>
+    <div id="page" class="page column">
+      <div class='title column center'>
+        <h1> Letter Jump </h1>
+        <div> {{ max }} </div>
+        <input type="range" v-model="max" name="volume" min="1" max="10">
+      </div>
+      <div class='content row center'>
+        <div> {{ letter }} </div>
+        <div> {{ operator }} </div>
+        <div> {{ jump }} </div>
+      </div>
+      <div class='actions row center'>
+        <input v-on:keyup.enter="check()" :style= "error ? 'color: red;' : 'color: black;'" v-model="test"/>
+        <button @click="check()">Validate</button>
+      </div>
+      <div class='history column center' v-for="h in history">
+        <div> {{ h }} </div>
+      </div>
+    </div>
+    <script type="module">
+      import Vue from 'https://unpkg.com/vue@2.6.10/dist/vue.esm.browser.js'
+      window.random =  Vue.prototype.random = x => {
+        return Math.floor(Math.random() * (x)) + 1;
+      }
+
+      window.vm = new Vue({
+        el: '#page',
+        data: {
+          alphabet: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'],
+          operations: ['+', '-'],
+          letter: 'a',
+          operator: '+',
+          jump: 1,
+          test: '',
+          error: false,
+          max: 4,
+          history: [],
+        },
+        methods: {
+          solution(){
+            if(this.operator === '+') {
+              if (this.alphabet.indexOf(this.letter) + this.jump <= 25) return +this.alphabet.indexOf(this.letter) + this.jump
+              return + this.jump - (26 - this.alphabet.indexOf(this.letter))
+            }
+            if(this.operator === '-') {
+              if (this.alphabet.indexOf(this.letter) - this.jump >= 0) return +this.alphabet.indexOf(this.letter) - this.jump
+              return 26 - this.jump + this.alphabet.indexOf(this.letter)
+            }
+          },
+          check(){
+            if(this.alphabet[this.solution()] === this.test.toLowerCase()) this.random()
+            this.error = true
+          },
+          random() {
+             this.history.push([this.letter,this.operator,this.jump,'=',this.test].join(' '))
+             this.error = false
+             this.test = ''
+             this.letter = this.alphabet[random(26) - 1]
+             this.operator = this.operations[random(2) - 1]
+             this.jump = random(this.max)
+          },
+        },
+      })
+    </script>
+  </body>
+</html>
