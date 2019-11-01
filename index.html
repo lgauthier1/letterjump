@@ -16,16 +16,21 @@
   </head>
   <body>
     <div id="page" class="page column">
-      <div class='title column center'>
+      <div class='title column center' v-if='mode === "jump"'>
         <h1> Letter Jump </h1>
+        <button @click="mode = 'pos'">Switch</button>
         <div> {{ max }} </div>
+
         <input type="range" v-model="max" name="volume" min="1" max="10">
+      </div>
+      <div class='title column center' v-if='mode === "pos"'>
+        <h1> Letter positions </h1>
+        <button @click="mode = 'jump'">Switch</button>
       </div>
       <div class='content row center'>
         <div> {{ letter }} </div>
-        <div> {{ operator }} </div>
-        <div> {{ jump }} </div>
-
+        <div v-if='mode === "jump"'> {{ operator }} </div>
+        <div v-if='mode === "jump"'> {{ jump }} </div>
       </div>
       <div class='actions row center'>
         <input v-on:keyup.enter="check()" :style= "error ? 'color: red;font-size:20px;' : 'color: black'" v-model="test"/>
@@ -53,9 +58,10 @@
           error: false,
           max: 4,
           history: [],
+          mode: 'pos',
         },
         methods: {
-          solution(){
+          solution_jump(){
             if(this.operator === '+') {
               if (this.alphabet.indexOf(this.letter) + this.jump <= 25) return +this.alphabet.indexOf(this.letter) + this.jump
               return + this.jump - (26 - this.alphabet.indexOf(this.letter))
@@ -65,13 +71,19 @@
               return 26 - this.jump + this.alphabet.indexOf(this.letter)
             }
           },
+          solution_position(){
+            return this.alphabet.indexOf(this.letter)
+          },
+          solutions(){
+            if(this.mode === 'jump') return this.alphabet[this.solution_jump()] === this.test.toLowerCase()
+            if(this.mode === 'pos') return this.solution_position() + 1 == this.test.toLowerCase()
+          },
           check(){
-            console.log('check...')
-            if(this.alphabet[this.solution()] === this.test.toLowerCase()) return this.random()
+            if(this.solutions()) return this.random()
             this.error = true
           },
           random() {
-             this.history.push([this.letter,this.operator,this.jump,'=',this.test].join(' '))
+             if(this.mode === 'jump') this.history.push([this.letter,this.operator,this.jump,'=',this.test].join(' '))
              this.test = ''
              this.letter = this.alphabet[random(26) - 1]
              this.operator = this.operations[random(2) - 1]
