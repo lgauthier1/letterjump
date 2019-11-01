@@ -9,7 +9,7 @@
       .page { width: 75%;margin-left: 10%;padding: 8px;transition: var(--transition); }
       .content { width:100%;font-size: 100px;padding: 8px;}
       .content > div { padding: 16px; }
-      .actions { margin-top: 10px;padding: 16px; }
+      .actions { margin-top: 10px;padding: 16px;font-size: 20px;}
       .actions button { margin-left: 10px; }
     </style>
   </head>
@@ -24,9 +24,10 @@
         <div> {{ letter }} </div>
         <div> {{ operator }} </div>
         <div> {{ jump }} </div>
+
       </div>
       <div class='actions row center'>
-        <input v-on:keyup.enter="check()" :style= "error ? 'color: red;' : 'color: black;'" v-model="test"/>
+        <input v-on:keyup.enter="check()" :style= "error ? 'color: red;font-size:20px;' : 'color: black'" v-model="test"/>
         <button @click="check()">Validate</button>
       </div>
       <div class='history column center' v-for="h in history">
@@ -64,16 +65,17 @@
             }
           },
           check(){
-            if(this.alphabet[this.solution()] === this.test.toLowerCase()) this.random()
+            console.log('check...')
+            if(this.alphabet[this.solution()] === this.test.toLowerCase()) return this.random()
             this.error = true
           },
           random() {
              this.history.push([this.letter,this.operator,this.jump,'=',this.test].join(' '))
-             this.error = false
              this.test = ''
              this.letter = this.alphabet[random(26) - 1]
              this.operator = this.operations[random(2) - 1]
              this.jump = random(this.max)
+             this.error = false
           },
         },
       })
