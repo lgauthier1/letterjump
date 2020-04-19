@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>Letter Jump</title>
     <style>
-      @import url(//rawcss.com/raw.css);
+      @import url(//cdn.rawgit.com/vbrajon/rawcss/2ca9981dd6113e5601bf42d75cb86d1ae4791923/raw.css);
       input[type=range] { padding: 0px; }
       .page { width: 75%;margin-left: 10%;padding: 8px;transition: var(--transition); }
       .content { width:100%;font-size: 100px;padding: 8px;}
@@ -12,29 +12,32 @@
       .actions { margin-top: 10px;padding: 16px;font-size: 20px;}
       .actions input { width: 35%; }
       .actions button { margin-left: 10px; }
+      .title .menu { display: none;}
+      .title:hover .menu { display: block;}
     </style>
   </head>
   <body>
     <div id="page" class="page column">
-      <div class='title column center' v-if='mode === "jump"'>
-        <h1> Letter Jump </h1>
-        <button @click="mode = 'pos'">Switch</button>
-        <div> {{ max }} </div>
+      <div class='title column center'>
+        <h1> {{ mode === 'pos' ? 'Letter Position' : 'Letter Jumping' }} </h1>
+        <div class='menu'>
+          <button :style="mode === 'jump' ? 'background: var(--secondary);' : '' " @click="mode = 'jump'">Letter Jumping</button>
+          <button :style="mode === 'pos' ? 'background: var(--secondary);' : '' " @click="mode = 'pos'">Letter Position</button>
+        </div>
+      </div>
 
-        <input type="range" v-model="max" name="volume" min="1" max="10">
-      </div>
-      <div class='title column center' v-if='mode === "pos"'>
-        <h1> Letter positions </h1>
-        <button @click="mode = 'jump'">Switch</button>
-      </div>
       <div class='content row center'>
-        <div> {{ letter }} </div>
+        <div> {{ letter.toUpperCase() }} </div>
         <div v-if='mode === "jump"'> {{ operator }} </div>
         <div v-if='mode === "jump"'> {{ jump }} </div>
       </div>
       <div class='actions row center'>
         <input v-on:keyup.enter="check()" :style= "error ? 'color: red;font-size:20px;' : 'color: black'" v-model="test"/>
         <button @click="check()">Validate</button>
+      </div>
+      <div class='column center' v-if="mode ==='jump'">
+        <div> Max Step: {{ max }} </div>
+        <input type="range" v-model="max" name="volume" min="1" max="10">
       </div>
       <div class='history column center' v-for="h in history">
         <div> {{ h }} </div>
@@ -84,6 +87,7 @@
           },
           random() {
              if(this.mode === 'jump') this.history.push([this.letter,this.operator,this.jump,'=',this.test].join(' '))
+             if(this.mode === 'pos') this.history.push([this.letter,'=',this.test].join(' '))
              this.test = ''
              this.letter = this.alphabet[random(26) - 1]
              this.operator = this.operations[random(2) - 1]
